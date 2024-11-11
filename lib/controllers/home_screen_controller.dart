@@ -80,9 +80,12 @@ class HomeScreenController extends GetxController {
     List<dynamic> value = await ApiServices()
         .getSemesterResult(AppUrls.semesterResultUrl(semesterId, studentId));
     //print(value);
+    bool isExisted = allsemesterStudentResult
+        .any((result) => result[0].semesterId == semesterId);
     if (value.isNotEmpty) {
-      allsemesterStudentResult.add(value);
-
+      if (!isExisted) {
+        allsemesterStudentResult.add(value);
+      }
       semesterCounter.value += 1;
     } else {
       print('value is empty');

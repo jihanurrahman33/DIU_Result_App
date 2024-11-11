@@ -3,7 +3,11 @@ class StudentSemesterResultModel {
   String? semesterName;
   String? cgpa;
 
-  StudentSemesterResultModel({this.semesterId, this.semesterName, this.cgpa});
+  StudentSemesterResultModel({
+    this.semesterId,
+    this.semesterName,
+    this.cgpa,
+  });
 
   factory StudentSemesterResultModel.fromJson(Map<String?, dynamic> json) {
     return StudentSemesterResultModel(
