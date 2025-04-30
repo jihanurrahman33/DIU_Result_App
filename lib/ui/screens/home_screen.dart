@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:get/instance_manager.dart';
-import 'package:get/utils.dart';
 import 'package:result/data/controllers/personal_info_controller.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -11,7 +10,13 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Diu Result App'),
+        title: Text(
+          'DIU RESULT',
+          style: Theme.of(context)
+              .textTheme
+              .headlineLarge!
+              .copyWith(color: Colors.white, fontWeight: FontWeight.w900),
+        ),
         centerTitle: true,
       ),
       body: GetBuilder<PersonalInfoController>(builder: (controller) {
@@ -29,26 +34,19 @@ class HomeScreen extends StatelessWidget {
                 },
                 decoration: InputDecoration(
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: Colors.lightBlue[50],
                     hintText: 'Enter your id:',
                     prefixIcon: const Icon(Icons.search),
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(20))),
               ),
             ),
-            // ElevatedButton(
-            //     style: ElevatedButton.styleFrom(
-            //         padding: const EdgeInsets.all(20),
-            //         backgroundColor: Colors.lightBlue,
-            //         foregroundColor: Colors.white,
-            //         fixedSize: const Size(double.maxFinite, 60)),
-            //     onPressed: () {},
-            //     child: const Text('View')),
-            const SizedBox(
-              height: 20,
-            ),
             Card(
-              color: Colors.lightBlue,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
+              elevation: 4,
+              color: Colors.lightBlue[50],
+              margin: const EdgeInsets.all(10),
               child: Padding(
                 padding: const EdgeInsets.all(20),
                 child: Column(
@@ -58,42 +56,33 @@ class HomeScreen extends StatelessWidget {
                       child: Text(
                         'Student Info',
                         textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.titleLarge,
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.blue[900],
+                            ),
                       ),
                     ),
-                    const Divider(),
-                    Text(
-                      'Name: ${controller.personalInfo?.studentName ?? ''}',
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Text(
-                      'Student ID: ${controller.personalInfo?.studentId ?? ''}',
-                      style: Theme.of(context).textTheme.bodyLarge,
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Text(
-                      'Program: ${controller.personalInfo?.progShortName ?? ''}',
-                      style: Theme.of(context).textTheme.bodyLarge,
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Text(
-                      'Batch: ${controller.personalInfo?.batchNo ?? ''}',
-                      style: Theme.of(context).textTheme.bodyLarge,
-                    ),
+                    const SizedBox(height: 10),
+                    const Divider(thickness: 1.5),
+                    const SizedBox(height: 10),
+                    _buildInfoRow(Icons.person, 'Name',
+                        controller.personalInfo?.studentName ?? ''),
+                    const SizedBox(height: 10),
+                    _buildInfoRow(Icons.badge, 'Student ID',
+                        controller.personalInfo?.studentId ?? ''),
+                    const SizedBox(height: 10),
+                    _buildInfoRow(Icons.school, 'Program',
+                        controller.personalInfo?.progShortName ?? ''),
+                    const SizedBox(height: 10),
+                    _buildInfoRow(Icons.group, 'Batch',
+                        controller.personalInfo?.batchNo.toString() ?? ''),
                   ],
                 ),
               ),
             ),
             Expanded(
               child: GridView.builder(
-                  itemCount: controller.diuAllSemesterList.length,
+                  itemCount: 10,
                   shrinkWrap: true,
                   primary: false,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -102,13 +91,13 @@ class HomeScreen extends StatelessWidget {
                       crossAxisCount: 2),
                   itemBuilder: (context, index) {
                     return Container(
-                      padding: const EdgeInsets.all(20),
-                      margin: const EdgeInsets.all(20),
+                      padding: const EdgeInsets.all(10),
+                      margin: const EdgeInsets.all(10),
                       height: 60,
                       width: 60,
-                      decoration: const BoxDecoration(
-                          color: Colors.lightBlue,
-                          borderRadius: BorderRadius.only(
+                      decoration: BoxDecoration(
+                          color: Colors.lightBlue[50],
+                          borderRadius: const BorderRadius.only(
                               topLeft: Radius.circular(20),
                               bottomRight: Radius.circular(20))),
                       child: Column(
@@ -129,6 +118,26 @@ class HomeScreen extends StatelessWidget {
           ],
         );
       }),
+    );
+  }
+
+  Widget _buildInfoRow(IconData icon, String label, String value) {
+    return Row(
+      children: [
+        Icon(icon, color: Colors.blue[700]),
+        const SizedBox(width: 10),
+        Text(
+          '$label: ',
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        Expanded(
+          child: Text(
+            value,
+            style: const TextStyle(color: Colors.black87),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
     );
   }
 }

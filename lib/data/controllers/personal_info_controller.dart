@@ -26,13 +26,13 @@ class PersonalInfoController extends GetxController {
   }
 
   Future<void> fetchStudentCompletedSem(String studentId) async {
-    String StudentId = studentId.substring(0, 3);
-    int firstThreeAsInt = int.parse(StudentId);
+    String studentInitial = studentId.substring(0, 3);
+    int stdInitialasInt = int.parse(studentInitial);
     final response = await get(Uri.parse(AppUrls.allSemesterIdNameUrl));
     if (response.statusCode == 200) {
       final listJsonData = jsonDecode(response.body);
       for (var jsonData in listJsonData) {
-        if (jsonData['semesterId'] >= firstThreeAsInt) {
+        if (jsonData['semesterId'] >= stdInitialasInt) {
           diuAllSemesterList.add(AllSemesterListModel.fromJson(jsonData));
         }
       }
