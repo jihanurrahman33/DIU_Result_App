@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
-import 'package:result/views/home_screen.dart';
+import 'package:result/controller_binder.dart';
+import 'package:result/ui/screens/home_screen.dart';
 
-class App extends StatelessWidget {
-  const App({super.key});
+class DiuResultApp extends StatelessWidget {
+  const DiuResultApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const GetMaterialApp(
+    return GetMaterialApp(
+      theme: ThemeData(
+          appBarTheme: const AppBarTheme(
+              backgroundColor: Colors.blueGrey,
+              titleTextStyle: TextStyle(color: Colors.white, fontSize: 30)),
+          scaffoldBackgroundColor: Colors.blueGrey),
       debugShowCheckedModeBanner: false,
-      home: HomeScreen(),
+      home: const HomeScreen(),
+      initialBinding: ControllerBinder(),
     );
   }
 }
