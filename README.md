@@ -1,9 +1,3 @@
-Here’s a rewritten README.md for your DIU Result App with improved formatting, clarity, and professionalism. I’ve also added placeholders for screenshots (assets/s1.png, assets/s2.png, assets/s3.png) which you should add to your project’s assets directory.
-
-⸻
-
-
-
 # 📘 DIU Result App
 
 The **DIU Result App** is a Flutter-based mobile application developed to help students of **Daffodil International University (DIU)** conveniently access their academic results. The app connects to DIU’s open APIs and displays student details and semester-wise results in real-time.
