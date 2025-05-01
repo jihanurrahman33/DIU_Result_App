@@ -39,11 +39,10 @@ The **DIU Result App** is a Flutter-based mobile application developed to help s
 
 ## 📸 Screenshots
 
-| Screen | Description |
-|--------|-------------|
-| ![Home Screen](assets/s1.png) | Home Screen: Enter Student ID |
-| ![Loading Screen](assets/s2.png) | Shimmer Effect while loading |
-| ![Result Screen](assets/s3.png) | Result Screen: Displayed semester CGPA & course results |
+| Home Screen | Loading Screen | Result Screen |
+|-------------|----------------|---------------|
+| ![Home](assets/s1.png) | ![Loading](assets/s2.png) | ![Result](assets/s3.png) |
+| Enter Student ID | Shimmer loading while fetching data | Semester results displayed |
 
 ---
 
@@ -105,19 +104,15 @@ Special thanks to Daffodil International University for providing open APIs that
 
 ⸻
 
+✅ Assets Setup
 
-
----
-
-✅ **Next Step:**  
 Save your screenshots as:
-- `assets/s1.png` (Home screen)
-- `assets/s2.png` (Loading/shimmer screen)
-- `assets/s3.png` (Result screen)
+	•	assets/s1.png → Home screen
+	•	assets/s2.png → Loading/shimmer screen
+	•	assets/s3.png → Result screen
 
-And include them in your `pubspec.yaml` under `assets:` like this:
+Add them in your pubspec.yaml:
 
-```yaml
 flutter:
   assets:
     - assets/s1.png
