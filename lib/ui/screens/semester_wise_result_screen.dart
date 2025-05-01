@@ -117,7 +117,7 @@ class SemesterWiseResultScreen extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               Text(
-                  'CGPA: ${controller.studentAllSemesterResultList[cardIndex]['courses'][0].cgpa}',
+                  'Overall SGPA: ${controller.studentAllSemesterResultList[cardIndex]['courses'][0].cgpa}',
                   style: const TextStyle(
                       fontSize: 16, fontWeight: FontWeight.w600)),
             ],
