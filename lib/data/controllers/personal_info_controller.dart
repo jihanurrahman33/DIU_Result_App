@@ -6,82 +6,84 @@ import 'package:logger/logger.dart';
 import 'package:result/data/models/all_semester_list_model.dart';
 import 'package:result/data/models/personal_info_model.dart';
 import 'package:result/data/models/semester_wise_result_model.dart';
-
 import 'package:result/data/services/network_client.dart';
 import 'package:result/data/utils/urls.dart';
 
 class PersonalInfoController extends GetxController {
   bool _searchingInProgress = false;
   bool get searchingInProgress => _searchingInProgress;
+
   PersonalInfoModel? personalInfo;
   List<AllSemesterListModel> studentAllSemesterList = [];
   List<SemesterWiseResultModel> _oneSemResultList = [];
   List studentAllSemesterResultList = [];
+
   List<SemesterWiseResultModel> get oneSemResultList => _oneSemResultList;
+
+  final Logger _logger = Logger();
+
   Future<void> getPersonalInfo(String studentId) async {
     final response =
         await NetworkClient.getRequest(url: AppUrls.personalInfoUrl(studentId));
-    if (response.isSucess) {
-      personalInfo = PersonalInfoModel.fromJson(response.data!);
-      update();
-      //await fetchStudentCompletedSem(studentId);
+
+    if (response.isSucess && response.data != null) {
+      try {
+        personalInfo = PersonalInfoModel.fromJson(response.data!);
+        update();
+      } catch (e) {
+        _logger.e("Error parsing personal info: $e");
+        Get.snackbar("Error", "Failed to parse student info.");
+      }
     } else {
-      Get.snackbar('Error', response.errorMessage!);
+      Get.snackbar('Error', response.errorMessage ?? "Unknown error");
     }
   }
-
-  // Future<void> fetchStudentCompletedSem(String studentId) async {
-  //   final _logger = Logger();
-  //   studentAllSemesterList.clear();
-  //   String studentInitial = studentId.substring(0, 3);
-  //   int stdInitialAsInt = int.parse(studentInitial);
-  //   final response = await get(Uri.parse(AppUrls.allSemesterIdNameUrl));
-  //   _logger.i('URL=> ${AppUrls.allSemesterIdNameUrl}'
-  //       'Body=> ${response.body}');
-  //   if (response.statusCode == 200) {
-  //     final listJsonData = jsonDecode(response.body);
-  //     for (var jsonData in listJsonData) {
-  //       if (jsonData['semesterId'] != null &&
-  //           jsonData['semesterId'] >= stdInitialAsInt) {
-  //         studentAllSemesterList.add(AllSemesterListModel.fromJson(jsonData));
-  //       }
-  //     }
-  //     update();
-  //   } else {
-  //     Get.snackbar(
-  //         snackPosition: SnackPosition.BOTTOM,
-  //         response.statusCode.toString(),
-  //         response.body);
-  //   }
-  // }
 
   Future<void> fetchStudentResult(String studentId) async {
     _searchingInProgress = true;
     update();
+
     _oneSemResultList.clear();
     studentAllSemesterResultList.clear();
-    Logger _logger = Logger();
-    //for (var semesterId in studentAllSemesterList) {
-    final response = await get(Uri.parse(AppUrls.semesterResultUrl(
-        // semesterId.semesterId.toString(),
-        251.toString(),
-        studentId)));
+
+    final String url = AppUrls.semesterResultUrl("251", studentId);
+    final response = await get(Uri.parse(url));
+
+    _logger.i('URL => $url');
+
     if (response.statusCode == 200) {
-      final decodedJson = jsonDecode(response.body);
-      _logger.i('URL=>${AppUrls.semesterResultUrl(251.toString(), studentId)}'
-          'Response Body=> $decodedJson');
-      for (var subjectResult in decodedJson) {
-        _oneSemResultList.add(SemesterWiseResultModel.fromJson(subjectResult));
+      if (response.body.isNotEmpty) {
+        try {
+          final decodedJson = jsonDecode(response.body);
+
+          for (var subjectResult in decodedJson) {
+            _oneSemResultList
+                .add(SemesterWiseResultModel.fromJson(subjectResult));
+          }
+
+          if (_oneSemResultList.isNotEmpty) {
+            studentAllSemesterResultList.add({
+              'semesterName': _oneSemResultList[0].semesterName,
+              'semesterYear': _oneSemResultList[0].semesterYear,
+              'cgpa': _oneSemResultList[0].cgpa,
+              'courses': _oneSemResultList,
+            });
+          }
+        } catch (e) {
+          _logger.e("Error parsing semester results: $e");
+          Get.snackbar("Error", "Invalid data format in semester result.");
+        }
+      } else {
+        _logger.w("Empty response body for student result");
+        Get.snackbar("Error", "No data found for this student.");
       }
-      studentAllSemesterResultList.add({
-        'semesterName': _oneSemResultList[0].semesterName,
-        'semesterYear': _oneSemResultList[0].semesterYear,
-        'cgpa': _oneSemResultList[0].cgpa,
-        'courses': _oneSemResultList
-      });
-      _searchingInProgress = false;
-      update();
-      // }
+    } else {
+      _logger.e("Request failed: ${response.statusCode}");
+      Get.snackbar(
+          "Error", "Failed to load result. Code: ${response.statusCode}");
     }
+
+    _searchingInProgress = false;
+    update();
   }
 }

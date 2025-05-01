@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:result/data/controllers/personal_info_controller.dart';
 import 'package:result/ui/screens/semester_wise_result_screen.dart';
 import 'package:result/ui/widgets/background.dart';
+import 'package:shimmer/shimmer.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -40,45 +41,53 @@ class HomeScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(20))),
               ),
             ),
-            Card(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16)),
-              elevation: 4,
-              color: Colors.lightBlue[50],
-              margin: const EdgeInsets.all(10),
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Center(
-                      child: Text(
-                        'Student Info',
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.blue[900],
+            controller.searchingInProgress
+                ? _buildShimmerCard()
+                : Card(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16)),
+                    elevation: 4,
+                    color: Colors.lightBlue[50],
+                    margin: const EdgeInsets.all(10),
+                    child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Center(
+                            child: Text(
+                              'Student Info',
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleLarge
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.blue[900],
+                                  ),
                             ),
+                          ),
+                          const SizedBox(height: 10),
+                          const Divider(thickness: 1.5),
+                          const SizedBox(height: 10),
+                          _buildInfoRow(Icons.person, 'Name',
+                              controller.personalInfo?.studentName ?? ''),
+                          const SizedBox(height: 10),
+                          _buildInfoRow(Icons.badge, 'Student ID',
+                              controller.personalInfo?.studentId ?? ''),
+                          const SizedBox(height: 10),
+                          _buildInfoRow(Icons.school, 'Program',
+                              controller.personalInfo?.progShortName ?? ''),
+                          const SizedBox(height: 10),
+                          _buildInfoRow(
+                              Icons.group,
+                              'Batch',
+                              controller.personalInfo?.batchNo.toString() ??
+                                  ''),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 10),
-                    const Divider(thickness: 1.5),
-                    const SizedBox(height: 10),
-                    _buildInfoRow(Icons.person, 'Name',
-                        controller.personalInfo?.studentName ?? ''),
-                    const SizedBox(height: 10),
-                    _buildInfoRow(Icons.badge, 'Student ID',
-                        controller.personalInfo?.studentId ?? ''),
-                    const SizedBox(height: 10),
-                    _buildInfoRow(Icons.school, 'Program',
-                        controller.personalInfo?.progShortName ?? ''),
-                    const SizedBox(height: 10),
-                    _buildInfoRow(Icons.group, 'Batch',
-                        controller.personalInfo?.batchNo.toString() ?? ''),
-                  ],
-                ),
-              ),
-            ),
+                  ),
             Visibility(
               visible: controller.searchingInProgress == false,
               replacement: const Center(
@@ -191,6 +200,38 @@ class HomeScreen extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildShimmerCard() {
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      elevation: 4,
+      color: Colors.grey[200],
+      margin: const EdgeInsets.all(10),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Shimmer.fromColors(
+          baseColor: Colors.grey[300]!,
+          highlightColor: Colors.grey[100]!,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: List.generate(5, (index) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Container(
+                  width: double.infinity,
+                  height: 20,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              );
+            }),
+          ),
+        ),
+      ),
     );
   }
 }

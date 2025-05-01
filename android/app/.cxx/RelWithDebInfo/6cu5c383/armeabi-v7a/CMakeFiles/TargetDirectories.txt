@@ -1,0 +1,2 @@
+/Users/nishak/Downloads/Flutter Project/DIU_Result_App/android/app/.cxx/RelWithDebInfo/6cu5c383/armeabi-v7a/CMakeFiles/edit_cache.dir
+/Users/nishak/Downloads/Flutter Project/DIU_Result_App/android/app/.cxx/RelWithDebInfo/6cu5c383/armeabi-v7a/CMakeFiles/rebuild_cache.dir
