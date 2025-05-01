@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:result/data/controllers/personal_info_controller.dart';
 import 'package:result/ui/widgets/background.dart';
-import 'package:fl_chart/fl_chart.dart';
 
 class SemesterWiseResultScreen extends StatelessWidget {
   const SemesterWiseResultScreen({super.key, required this.cardIndex});
