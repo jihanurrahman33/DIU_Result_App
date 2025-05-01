@@ -79,94 +79,94 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
             ),
-            controller.studentAllSemesterList.isEmpty
-                ? Center(
-                    child: Text(
-                      'Search for result',
-                      style: Theme.of(context)
-                          .textTheme
-                          .titleLarge!
-                          .copyWith(color: Colors.white54),
-                    ),
-                  )
-                :
-            Expanded(
-              child: GridView.builder(
-                  physics: const BouncingScrollPhysics(),
-                  itemCount: 5,
-                  shrinkWrap: true,
-                  primary: false,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisSpacing: 5,
-                      mainAxisSpacing: 5,
-                      crossAxisCount: 2),
-                  itemBuilder: (context, index) {
-                    return InkWell(
-                      onTap: _onTapSemesterResultCard,
-                      child: Container(
-                        padding: const EdgeInsets.all(10),
-                        margin: const EdgeInsets.all(5),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              Colors.lightBlue.shade200,
-                              Colors.blueAccent.shade100
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          borderRadius: const BorderRadius.only(
-                              topLeft: Radius.circular(20),
-                              bottomRight: Radius.circular(20)),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.blue.withOpacity(0.3),
-                              blurRadius: 10,
-                              offset: const Offset(4, 6),
+            Visibility(
+              visible: controller.searchingInProgress == false,
+              replacement: const Center(
+                child: CircularProgressIndicator(),
+              ),
+              child: Expanded(
+                child: GridView.builder(
+                    physics: const BouncingScrollPhysics(),
+                    itemCount: controller.studentAllSemesterResultList.length,
+                    shrinkWrap: true,
+                    primary: false,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisSpacing: 5,
+                            mainAxisSpacing: 5,
+                            crossAxisCount: 2),
+                    itemBuilder: (context, index) {
+                      return InkWell(
+                        onTap: () {
+                          Get.to(() => SemesterWiseResultScreen(
+                                cardIndex: index,
+                              ));
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(10),
+                          margin: const EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.lightBlue.shade200,
+                                Colors.blueAccent.shade100
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
                             ),
-                          ],
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            CircleAvatar(
-                              radius: 25,
-                              backgroundColor: Colors.white.withOpacity(0.8),
-                              child: const Icon(
-                                Icons.school_rounded,
-                                size: 30,
-                                color: Colors.blueAccent,
+                            borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(20),
+                                bottomRight: Radius.circular(20)),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.blue.withOpacity(0.3),
+                                blurRadius: 10,
+                                offset: const Offset(4, 6),
                               ),
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                                'Spring-2025',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium!
-                                  .copyWith(
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.blue[900],
-                                  ),
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              'SGPA: 4.00',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleLarge!
-                                  .copyWith(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.indigo.shade900,
-                                  ),
-                            ),
-                          ],
+                            ],
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              CircleAvatar(
+                                radius: 25,
+                                backgroundColor: Colors.white.withOpacity(0.8),
+                                child: const Icon(
+                                  Icons.school_rounded,
+                                  size: 30,
+                                  color: Colors.blueAccent,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                '${controller.studentAllSemesterResultList[index]['semesterName']}-${controller.studentAllSemesterResultList[index]['semesterYear']}',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium!
+                                    .copyWith(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.blue[900],
+                                    ),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                'SGPA: ${controller.studentAllSemesterResultList[index]['cgpa']}',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge!
+                                    .copyWith(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.indigo.shade900,
+                                    ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    );
-                  }),
+                      );
+                    }),
+              ),
             ),
           ],
         );
@@ -192,9 +192,5 @@ class HomeScreen extends StatelessWidget {
         ),
       ],
     );
-  }
-
-  _onTapSemesterResultCard() {
-    Get.to(() => const SemesterWiseResultScreen());
   }
 }

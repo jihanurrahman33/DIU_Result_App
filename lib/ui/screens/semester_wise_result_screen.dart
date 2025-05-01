@@ -1,104 +1,118 @@
 import 'package:flutter/material.dart';
+import 'package:get/get_state_manager/src/simple/get_state.dart';
+import 'package:result/data/controllers/personal_info_controller.dart';
 import 'package:result/ui/widgets/background.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class SemesterWiseResultScreen extends StatelessWidget {
-  const SemesterWiseResultScreen({super.key});
-
-  final List<Map<String, dynamic>> subjects = const [
-    {'title': 'Basic Electronics', 'cgpa': 3.45},
-    {'title': 'Engineering Mathematics', 'cgpa': 3.24},
-    {'title': 'Object Oriented Programming', 'cgpa': 3.34},
-    {'title': 'Python Basics', 'cgpa': 2.19},
-    {'title': 'Data Structure', 'cgpa': 3.25},
-  ];
+  const SemesterWiseResultScreen({super.key, required this.cardIndex});
+  final int cardIndex;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Spring-2025',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.blueAccent,
-        foregroundColor: Colors.white,
-        elevation: 0,
-      ),
-      body: ScreenBackground(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8),
-          child: Column(
-            children: [
-              const SizedBox(height: 10),
-              _buildPieChart(),
-              const SizedBox(height: 20),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: 4,
-                  itemBuilder: (context, index) {
-                    return _buildSubjectCard(
-                      context,
-                      subjectName: subjects[index]['title'],
-                      grade: 'A+',
-                      credit: 3.0,
-                      gpa: subjects[index]['cgpa'],
-                    );
-                  },
-                ),
-              ),
-            ],
+      body: GetBuilder<PersonalInfoController>(
+        builder: (controller) => ScreenBackground(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8),
+            child: Column(
+              children: [
+                const SizedBox(height: 10),
+                //_buildPieChart(),
+                const SizedBox(height: 20),
+                controller.studentAllSemesterResultList[cardIndex]['courses'][0]
+                            .tevalSubmitted ==
+                        'SUBMITTED'
+                    ? Expanded(
+                        child: ListView.builder(
+                          itemCount: controller
+                              .studentAllSemesterResultList[cardIndex]
+                                  ['courses']
+                              .length,
+                          itemBuilder: (context, index) {
+                            return _buildSubjectCard(
+                              context,
+                              subjectName: controller
+                                  .studentAllSemesterResultList[cardIndex]
+                                      ['courses'][index]
+                                  .courseTitle,
+                              grade: controller
+                                  .studentAllSemesterResultList[cardIndex]
+                                      ['courses'][index]
+                                  .gradeLetter,
+                              credit: controller
+                                  .studentAllSemesterResultList[cardIndex]
+                                      ['courses'][index]
+                                  .totalCredit,
+                              gpa: controller
+                                  .studentAllSemesterResultList[cardIndex]
+                                      ['courses'][index]
+                                  .pointEquivalent,
+                            );
+                          },
+                        ),
+                      )
+                    : Center(
+                        child: Text(
+                          'Complete Teaching Evaluation First',
+                          style:
+                              Theme.of(context).textTheme.bodyLarge!.copyWith(
+                                    color: Colors.white,
+                                  ),
+                        ),
+                      ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildPieChart() {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            const Text(
-              'CGPA Distribution',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
-            SizedBox(
-              height: 200,
-              child: PieChart(
-                PieChartData(
-                  sectionsSpace: 2,
-                  centerSpaceRadius: 40,
-                  sections: List.generate(subjects.length, (index) {
-                    final color =
-                        Colors.primaries[index % Colors.primaries.length];
-                    return PieChartSectionData(
-                      color: color.shade300,
-                      value: subjects[index]['cgpa'],
-                      radius: 60,
-                      titleStyle: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    );
-                  }),
-                ),
-              ),
-            ),
-            const SizedBox(height: 10),
-            const Text('CGPA: 3.56',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-          ],
-        ),
-      ),
-    );
-  }
+  // Widget _buildPieChart() {
+  //   return Card(
+  //     elevation: 4,
+  //     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+  //     child: Padding(
+  //       padding: const EdgeInsets.all(16.0),
+  //       child: Column(
+  //         children: [
+  //           const Text(
+  //             'CGPA Distribution',
+  //             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+  //           ),
+  //           const SizedBox(height: 20),
+  //           SizedBox(
+  //             height: 200,
+  //             child: PieChart(
+  //               PieChartData(
+  //                 sectionsSpace: 2,
+  //                 centerSpaceRadius: 40,
+  //                 sections: List.generate(subjects.length, (index) {
+  //                   final color =
+  //                       Colors.primaries[index % Colors.primaries.length];
+  //                   return PieChartSectionData(
+  //                     color: color.shade300,
+  //                     value: subjects[index]['cgpa'],
+  //                     radius: 60,
+  //                     titleStyle: const TextStyle(
+  //                       fontSize: 14,
+  //                       fontWeight: FontWeight.bold,
+  //                       color: Colors.white,
+  //                     ),
+  //                   );
+  //                 }),
+  //               ),
+  //             ),
+  //           ),
+  //           const SizedBox(height: 10),
+  //           const Text('CGPA: 3.56',
+  //               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget _buildSubjectCard(BuildContext context,
       {required String subjectName,
