@@ -29,6 +29,7 @@ class HomeScreen extends StatelessWidget {
                 onFieldSubmitted: (value) async {
                   await Get.find<PersonalInfoController>()
                       .getPersonalInfo(value);
+
                   await Get.find<PersonalInfoController>()
                       .fetchStudentResult(value);
                 },

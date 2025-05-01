@@ -1,3 +1,4 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:result/data/controllers/personal_info_controller.dart';
@@ -17,7 +18,7 @@ class SemesterWiseResultScreen extends StatelessWidget {
             child: Column(
               children: [
                 const SizedBox(height: 10),
-                //_buildPieChart(),
+                _buildPieChart(),
                 const SizedBox(height: 20),
                 controller.studentAllSemesterResultList[cardIndex]['courses'][0]
                             .tevalSubmitted ==
@@ -29,7 +30,10 @@ class SemesterWiseResultScreen extends StatelessWidget {
                                   ['courses']
                               .length,
                           itemBuilder: (context, index) {
+                            final color = Colors
+                                .primaries[index % Colors.primaries.length];
                             return _buildSubjectCard(
+                              color: color,
                               context,
                               subjectName: controller
                                   .studentAllSemesterResultList[cardIndex]
@@ -68,73 +72,73 @@ class SemesterWiseResultScreen extends StatelessWidget {
     );
   }
 
-  // Widget _buildPieChart() {
-  //   return Card(
-  //     elevation: 4,
-  //     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-  //     child: Padding(
-  //       padding: const EdgeInsets.all(16.0),
-  //       child: Column(
-  //         children: [
-  //           const Text(
-  //             'CGPA Distribution',
-  //             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-  //           ),
-  //           const SizedBox(height: 20),
-  //           SizedBox(
-  //             height: 200,
-  //             child: PieChart(
-  //               PieChartData(
-  //                 sectionsSpace: 2,
-  //                 centerSpaceRadius: 40,
-  //                 sections: List.generate(subjects.length, (index) {
-  //                   final color =
-  //                       Colors.primaries[index % Colors.primaries.length];
-  //                   return PieChartSectionData(
-  //                     color: color.shade300,
-  //                     value: subjects[index]['cgpa'],
-  //                     radius: 60,
-  //                     titleStyle: const TextStyle(
-  //                       fontSize: 14,
-  //                       fontWeight: FontWeight.bold,
-  //                       color: Colors.white,
-  //                     ),
-  //                   );
-  //                 }),
-  //               ),
-  //             ),
-  //           ),
-  //           const SizedBox(height: 10),
-  //           const Text('CGPA: 3.56',
-  //               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
+  Widget _buildPieChart() {
+    return GetBuilder<PersonalInfoController>(
+      builder: (controller) => Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              const Text(
+                'CGPA Distribution',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                height: 200,
+                child: PieChart(
+                  PieChartData(
+                    sectionsSpace: 2,
+                    centerSpaceRadius: 40,
+                    sections: List.generate(
+                        controller
+                            .studentAllSemesterResultList[cardIndex]['courses']
+                            .length, (index) {
+                      final color =
+                          Colors.primaries[index % Colors.primaries.length];
+                      return PieChartSectionData(
+                        color: color.shade300,
+                        value: controller
+                            .studentAllSemesterResultList[cardIndex]['courses']
+                                [index]
+                            .pointEquivalent,
+                        radius: 60,
+                        titleStyle: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      );
+                    }),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                  'CGPA: ${controller.studentAllSemesterResultList[cardIndex]['courses'][0].cgpa}',
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.w600)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
   Widget _buildSubjectCard(BuildContext context,
       {required String subjectName,
       required String grade,
       required double credit,
-      required double gpa}) {
+      required double gpa,
+      required Color color}) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.lightBlue.shade100, Colors.blue.shade200],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: color,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.blue.withOpacity(0.2),
-            blurRadius: 8,
-            offset: const Offset(2, 4),
-          ),
-        ],
       ),
       child: Row(
         children: [
@@ -158,20 +162,18 @@ class SemesterWiseResultScreen extends StatelessWidget {
                 Text(
                   subjectName,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: Colors.blue[900],
-                      ),
+                      fontWeight: FontWeight.w600, color: Colors.white),
                 ),
                 const SizedBox(height: 6),
                 Row(
                   children: [
-                    const Icon(Icons.book, size: 16, color: Colors.black),
+                    const Icon(Icons.book, size: 16, color: Colors.white),
                     const SizedBox(width: 4),
                     Text(
                       'Credit: $credit',
                       style: const TextStyle(
                         fontSize: 14,
-                        color: Colors.black,
+                        color: Colors.white,
                       ),
                     ),
                   ],
@@ -180,6 +182,7 @@ class SemesterWiseResultScreen extends StatelessWidget {
             ),
           ),
           Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               CircleAvatar(
@@ -194,6 +197,16 @@ class SemesterWiseResultScreen extends StatelessWidget {
                   ),
                 ),
               ),
+              const SizedBox(
+                height: 5,
+              ),
+              Text(
+                resultRemarks[grade],
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium!
+                    .copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+              )
             ],
           )
         ],
@@ -201,3 +214,16 @@ class SemesterWiseResultScreen extends StatelessWidget {
     );
   }
 }
+
+final Map<String, dynamic> resultRemarks = {
+  'A+': 'Outstanding',
+  'A': 'Excellent',
+  'A-': 'Very Good',
+  'B+': 'Good',
+  'B': 'Satisfactory',
+  'B-': 'Above Average',
+  'C+': 'Average',
+  'C': '	Bellow Average',
+  'D': 'Pass',
+  'F': 'Fail'
+};

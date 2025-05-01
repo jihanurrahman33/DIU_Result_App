@@ -15,20 +15,21 @@ class PersonalInfoController extends GetxController {
 
   PersonalInfoModel? personalInfo;
   List<AllSemesterListModel> studentAllSemesterList = [];
-  List<SemesterWiseResultModel> _oneSemResultList = [];
+  final List<SemesterWiseResultModel> _oneSemResultList = [];
   List studentAllSemesterResultList = [];
 
   List<SemesterWiseResultModel> get oneSemResultList => _oneSemResultList;
 
   final Logger _logger = Logger();
 
-  Future<void> getPersonalInfo(String studentId) async {
+  Future<bool> getPersonalInfo(String studentId) async {
     final response =
         await NetworkClient.getRequest(url: AppUrls.personalInfoUrl(studentId));
 
     if (response.isSucess && response.data != null) {
       try {
         personalInfo = PersonalInfoModel.fromJson(response.data!);
+
         update();
       } catch (e) {
         _logger.e("Error parsing personal info: $e");
@@ -37,6 +38,7 @@ class PersonalInfoController extends GetxController {
     } else {
       Get.snackbar('Error', response.errorMessage ?? "Unknown error");
     }
+    return response.isSucess;
   }
 
   Future<void> fetchStudentResult(String studentId) async {
