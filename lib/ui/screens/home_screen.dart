@@ -144,7 +144,7 @@ class HomeScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 12),
                               Text(
-                                "${studentResultController.studentResults[index]['oneSemResult'][0]['semesterName']}-${studentResultController.studentResults[index]['oneSemResult'][0]['semesterYear']}",
+                                "${studentResultController.studentResults[index]['oneSemRes'][0].semesterName}-${studentResultController.studentResults[index]['oneSemRes'][0].semesterYear} ",
                                 style: Theme.of(context)
                                     .textTheme
                                     .titleMedium!
@@ -156,7 +156,7 @@ class HomeScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 6),
                               Text(
-                                'SGPA: ${studentResultController.studentResults[index]['oneSemResult'][0]['cgpa']}',
+                                'SGPA: ${studentResultController.studentResults[index]['oneSemRes'][0].cgpa}',
                                 style: Theme.of(context)
                                     .textTheme
                                     .titleLarge!

@@ -13,10 +13,8 @@ class SemesterWiseResultScreen extends StatelessWidget {
     return Scaffold(
       body: GetBuilder<StudentResultController>(
         builder: (studentResultController) {
-          // Get the result map and extract the list of results
-          final Map<String, dynamic> semesterMap =
-              studentResultController.studentResults[cardIndex];
-          final List<dynamic> resultList = semesterMap.values.first;
+          final resultList =
+              studentResultController.studentResults[cardIndex]['oneSemRes'];
 
           return ScreenBackground(
             child: Padding(
@@ -25,38 +23,26 @@ class SemesterWiseResultScreen extends StatelessWidget {
               child: Column(
                 children: [
                   const SizedBox(height: 10),
-                  _buildPieChart(resultList),
+                  _buildBarChart(resultList),
                   const SizedBox(height: 20),
-                  resultList.isNotEmpty &&
-                          resultList[0]['tevalSubmitted'] == 'SUBMITTED'
-                      ? Expanded(
-                          child: ListView.builder(
-                            itemCount: resultList.length,
-                            itemBuilder: (context, index) {
-                              final result = resultList[index];
-                              final color = Colors
-                                  .primaries[index % Colors.primaries.length];
-
-                              return _buildSubjectCard(
-                                context,
-                                subjectName: result['courseTitle'],
-                                grade: result['gradeLetter'],
-                                credit: result['totalCredit'].toDouble(),
-                                gpa: result['pointEquivalent'].toDouble(),
-                                color: color,
-                              );
-                            },
-                          ),
-                        )
-                      : Center(
-                          child: Text(
-                            'Complete Teaching Evaluation First',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyLarge!
-                                .copyWith(color: Colors.white),
-                          ),
-                        ),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: resultList.length,
+                      itemBuilder: (context, index) {
+                        final subject = resultList[index];
+                        final color =
+                            Colors.primaries[index % Colors.primaries.length];
+                        return _buildSubjectCard(
+                          context,
+                          subjectName: subject.courseTitle,
+                          grade: subject.gradeLetter,
+                          credit: subject.totalCredit,
+                          gpa: subject.pointEquivalent,
+                          color: color,
+                        );
+                      },
+                    ),
+                  )
                 ],
               ),
             ),
@@ -66,44 +52,105 @@ class SemesterWiseResultScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPieChart(List<dynamic> resultList) {
+  Widget _buildBarChart(List<dynamic> resultList) {
     if (resultList.isEmpty) return const SizedBox();
 
     return Card(
-      elevation: 4,
+      elevation: 6,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             const Text(
-              'GPA Distribution',
+              'SGPA per Subject',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
             SizedBox(
-              height: 200,
-              child: PieChart(
-                PieChartData(
-                  sectionsSpace: 2,
-                  centerSpaceRadius: 40,
-                  sections: List.generate(resultList.length, (index) {
-                    final result = resultList[index];
+              height: 240,
+              child: BarChart(
+                BarChartData(
+                  alignment: BarChartAlignment.spaceAround,
+                  maxY: 4.0,
+                  minY: 0,
+                  barTouchData: BarTouchData(
+                    enabled: true,
+                    touchTooltipData: BarTouchTooltipData(
+                      getTooltipColor: (data) {
+                        return Colors.black87;
+                      },
+                      tooltipPadding: const EdgeInsets.all(8),
+                      tooltipMargin: 8,
+                      tooltipRoundedRadius: 8,
+                      tooltipBorder: BorderSide.none,
+                      getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                        return BarTooltipItem(
+                          '${resultList[group.x.toInt()].courseTitle}\nGPA: ${rod.toY.toStringAsFixed(2)}',
+                          const TextStyle(color: Colors.white),
+                        );
+                      },
+                    ),
+                  ),
+                  titlesData: FlTitlesData(
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: false,
+                        reservedSize: 40,
+                        getTitlesWidget: (value, meta) {
+                          final courseTitle =
+                              resultList[value.toInt()].courseTitle;
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: RotatedBox(
+                              quarterTurns: 1,
+                              child: Text(
+                                courseTitle,
+                                style: const TextStyle(
+                                    fontSize: 10, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        getTitlesWidget: (value, meta) {
+                          return Text(
+                            value.toStringAsFixed(1),
+                            style: const TextStyle(fontSize: 10),
+                          );
+                        },
+                      ),
+                    ),
+                    topTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false)),
+                    rightTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false)),
+                  ),
+                  borderData: FlBorderData(show: false),
+                  barGroups: List.generate(resultList.length, (index) {
+                    final subject = resultList[index];
+                    final double gpa = subject.pointEquivalent.toDouble();
                     final color =
                         Colors.primaries[index % Colors.primaries.length];
-                    final double value =
-                        (result['pointEquivalent'] as num?)?.toDouble() ?? 0.0;
-
-                    return PieChartSectionData(
-                      color: color.shade300,
-                      value: value,
-                      title: value.toStringAsFixed(2),
-                      radius: 60,
-                      titleStyle: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
+                    return BarChartGroupData(
+                      x: index,
+                      barRods: [
+                        BarChartRodData(
+                          toY: gpa,
+                          color: color.shade400,
+                          width: 20,
+                          borderRadius: BorderRadius.circular(8),
+                          backDrawRodData: BackgroundBarChartRodData(
+                            show: true,
+                            toY: 4.0,
+                            color: Colors.grey[300],
+                          ),
+                        )
+                      ],
                     );
                   }),
                 ),

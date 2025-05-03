@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:http/http.dart';
 import 'package:result/data/models/semester_model.dart';
+import 'package:result/data/models/semester_wise_result_list_model.dart';
 import 'package:result/data/utils/urls.dart';
 
 class StudentResultController extends GetxController {
@@ -42,7 +43,7 @@ class StudentResultController extends GetxController {
         int studentIdInitial = int.parse(studentIdInitialAsString);
         for (SemesterModel semester in semesterList) {
           final semesterId = int.parse(semester.semesterId);
-          if (semesterId > studentIdInitial) {
+          if (semesterId >= studentIdInitial) {
             studentCompledtedSemesters.add(semester);
           }
         }
@@ -57,16 +58,21 @@ class StudentResultController extends GetxController {
     update();
     getStudentCompletedSemester(studentId);
     studentResults.clear();
+    oneSemResult.clear();
     for (SemesterModel studentCompledtedSemester
         in studentCompledtedSemesters) {
       final response = await get(Uri.parse(AppUrls.semesterResultUrl(
           studentCompledtedSemester.semesterId.toString(), studentId)));
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
-        oneSemResult = jsonData;
+        SemesterWiseResultListModel semesterWiseResultListModel =
+            SemesterWiseResultListModel.fromJson(jsonData);
+        oneSemResult = semesterWiseResultListModel.resultList;
       }
       if (oneSemResult.isNotEmpty) {
-        studentResults.add({'oneSemResult': oneSemResult});
+        studentResults.add({
+          'oneSemRes': oneSemResult,
+        });
         update();
       }
     }

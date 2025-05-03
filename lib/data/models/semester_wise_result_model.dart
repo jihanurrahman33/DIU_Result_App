@@ -20,18 +20,4 @@ class SemesterWiseResultModel {
     cgpa = jsonData['cgpa'] ?? 0;
     tevalSubmitted = jsonData['tevalSubmitted'];
   }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'semesterName': semesterName,
-      'semesterYear': semesterYear,
-      'customCourseId': customCourseId,
-      'courseTitle': courseTitle,
-      'totalCredit': totalCredit,
-      'pointEquivalent': pointEquivalent,
-      'gradeLetter': gradeLetter,
-      'cgpa': cgpa,
-      'tevalSubmitted': tevalSubmitted,
-    };
-  }
 }
