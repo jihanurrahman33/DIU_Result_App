@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import 'package:result/data/controllers/personal_info_controller.dart';
+import 'package:result/data/controllers/student_result_controller.dart';
 import 'package:result/ui/screens/semester_wise_result_screen.dart';
 import 'package:result/ui/widgets/background.dart';
 import 'package:shimmer/shimmer.dart';
@@ -13,91 +13,86 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(body: ScreenBackground(
       child: GetBuilder<PersonalInfoController>(builder: (controller) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              'DIU RESULT',
-              style: Theme.of(context).textTheme.headlineLarge!.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w900,
-                  ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: TextFormField(
-                onFieldSubmitted: (value) async {
-                  await Get.find<PersonalInfoController>()
-                      .getPersonalInfo(value);
-
-                  await Get.find<PersonalInfoController>()
-                      .fetchStudentResult(value);
-                },
-                decoration: InputDecoration(
-                    filled: true,
-                    fillColor: Colors.lightBlue[50],
-                    hintText: 'Enter your id:',
-                    prefixIcon: const Icon(Icons.search),
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20))),
+        return GetBuilder<StudentResultController>(
+          builder: (studentResultController) => Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                'DIU RESULT',
+                style: Theme.of(context).textTheme.headlineLarge!.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w900,
+                    ),
               ),
-            ),
-            controller.searchingInProgress
-                ? _buildShimmerCard()
-                : Card(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16)),
-                    elevation: 4,
-                    color: Colors.lightBlue[50],
-                    margin: const EdgeInsets.all(10),
-                    child: Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Center(
-                            child: Text(
-                              'Student Info',
-                              textAlign: TextAlign.center,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleLarge
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.blue[900],
-                                  ),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: TextFormField(
+                  onFieldSubmitted: (value) async {
+                    await Get.find<PersonalInfoController>()
+                        .getPersonalInfo(value);
+                    await Get.find<StudentResultController>()
+                        .getStudentResult(value);
+                  },
+                  decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.lightBlue[50],
+                      hintText: 'Enter your id:',
+                      prefixIcon: const Icon(Icons.search),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20))),
+                ),
+              ),
+              studentResultController.searchingInProgress
+                  ? _buildShimmerCard()
+                  : Card(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16)),
+                      elevation: 4,
+                      color: Colors.lightBlue[50],
+                      margin: const EdgeInsets.all(10),
+                      child: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Center(
+                              child: Text(
+                                'Student Info',
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.blue[900],
+                                    ),
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 10),
-                          const Divider(thickness: 1.5),
-                          const SizedBox(height: 10),
-                          _buildInfoRow(Icons.person, 'Name',
-                              controller.personalInfo?.studentName ?? ''),
-                          const SizedBox(height: 10),
-                          _buildInfoRow(Icons.badge, 'Student ID',
-                              controller.personalInfo?.studentId ?? ''),
-                          const SizedBox(height: 10),
-                          _buildInfoRow(Icons.school, 'Program',
-                              controller.personalInfo?.progShortName ?? ''),
-                          const SizedBox(height: 10),
-                          _buildInfoRow(
-                              Icons.group,
-                              'Batch',
-                              controller.personalInfo?.batchNo.toString() ??
-                                  ''),
-                        ],
+                            const SizedBox(height: 10),
+                            const Divider(thickness: 1.5),
+                            const SizedBox(height: 10),
+                            _buildInfoRow(Icons.person, 'Name',
+                                controller.personalInfo?.studentName ?? ''),
+                            const SizedBox(height: 10),
+                            _buildInfoRow(Icons.badge, 'Student ID',
+                                controller.personalInfo?.studentId ?? ''),
+                            const SizedBox(height: 10),
+                            _buildInfoRow(Icons.school, 'Program',
+                                controller.personalInfo?.progShortName ?? ''),
+                            const SizedBox(height: 10),
+                            _buildInfoRow(
+                                Icons.group,
+                                'Batch',
+                                controller.personalInfo?.batchNo.toString() ??
+                                    ''),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-            Visibility(
-              visible: controller.searchingInProgress == false,
-              replacement: const Center(
-                child: CircularProgressIndicator(),
-              ),
-              child: Expanded(
+              Expanded(
                 child: GridView.builder(
                     physics: const BouncingScrollPhysics(),
-                    itemCount: controller.studentAllSemesterResultList.length,
+                    itemCount: studentResultController.studentResults.length,
                     shrinkWrap: true,
                     primary: false,
                     gridDelegate:
@@ -108,9 +103,9 @@ class HomeScreen extends StatelessWidget {
                     itemBuilder: (context, index) {
                       return InkWell(
                         onTap: () {
-                          Get.to(() => SemesterWiseResultScreen(
-                                cardIndex: index,
-                              ));
+                          Get.to(SemesterWiseResultScreen(
+                            cardIndex: index,
+                          ));
                         },
                         child: Container(
                           padding: const EdgeInsets.all(10),
@@ -149,7 +144,7 @@ class HomeScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 12),
                               Text(
-                                '${controller.studentAllSemesterResultList[index]['semesterName']}-${controller.studentAllSemesterResultList[index]['semesterYear']}',
+                                "${studentResultController.studentResults[index]['oneSemResult'][0]['semesterName']}-${studentResultController.studentResults[index]['oneSemResult'][0]['semesterYear']}",
                                 style: Theme.of(context)
                                     .textTheme
                                     .titleMedium!
@@ -161,7 +156,7 @@ class HomeScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 6),
                               Text(
-                                'SGPA: ${controller.studentAllSemesterResultList[index]['cgpa']}',
+                                'SGPA: ${studentResultController.studentResults[index]['oneSemResult'][0]['cgpa']}',
                                 style: Theme.of(context)
                                     .textTheme
                                     .titleLarge!
@@ -177,8 +172,8 @@ class HomeScreen extends StatelessWidget {
                       );
                     }),
               ),
-            ),
-          ],
+            ],
+          ),
         );
       }),
     ));

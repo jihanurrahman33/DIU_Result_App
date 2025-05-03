@@ -1,9 +1,9 @@
-class AllSemesterListModel {
-  late int semesterId;
-  late String semesterYear;
+class SemesterModel {
+  late String semesterId;
+  late int semesterYear;
   late String semesterName;
 
-  AllSemesterListModel.fromJson(Map<String, dynamic> jsondata) {
+  SemesterModel.fromJson(Map<String, dynamic> jsondata) {
     semesterId = jsondata['semesterId'] ?? '';
     semesterYear = jsondata['semesterYear'] ?? '';
     semesterName = jsondata['semesterName'] ?? '';

@@ -1,7 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get_state_manager/src/simple/get_state.dart';
-import 'package:result/data/controllers/personal_info_controller.dart';
+import 'package:get/get_state_manager/get_state_manager.dart';
+import 'package:result/data/controllers/student_result_controller.dart';
 import 'package:result/ui/widgets/background.dart';
 
 class SemesterWiseResultScreen extends StatelessWidget {
@@ -11,117 +11,105 @@ class SemesterWiseResultScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: GetBuilder<PersonalInfoController>(
-        builder: (controller) => ScreenBackground(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8),
-            child: Column(
-              children: [
-                const SizedBox(height: 10),
-                _buildPieChart(),
-                const SizedBox(height: 20),
-                controller.studentAllSemesterResultList[cardIndex]['courses'][0]
-                            .tevalSubmitted ==
-                        'SUBMITTED'
-                    ? Expanded(
-                        child: ListView.builder(
-                          itemCount: controller
-                              .studentAllSemesterResultList[cardIndex]
-                                  ['courses']
-                              .length,
-                          itemBuilder: (context, index) {
-                            final color = Colors
-                                .primaries[index % Colors.primaries.length];
-                            return _buildSubjectCard(
-                              color: color,
-                              context,
-                              subjectName: controller
-                                  .studentAllSemesterResultList[cardIndex]
-                                      ['courses'][index]
-                                  .courseTitle,
-                              grade: controller
-                                  .studentAllSemesterResultList[cardIndex]
-                                      ['courses'][index]
-                                  .gradeLetter,
-                              credit: controller
-                                  .studentAllSemesterResultList[cardIndex]
-                                      ['courses'][index]
-                                  .totalCredit,
-                              gpa: controller
-                                  .studentAllSemesterResultList[cardIndex]
-                                      ['courses'][index]
-                                  .pointEquivalent,
-                            );
-                          },
+      body: GetBuilder<StudentResultController>(
+        builder: (studentResultController) {
+          // Get the result map and extract the list of results
+          final Map<String, dynamic> semesterMap =
+              studentResultController.studentResults[cardIndex];
+          final List<dynamic> resultList = semesterMap.values.first;
+
+          return ScreenBackground(
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8),
+              child: Column(
+                children: [
+                  const SizedBox(height: 10),
+                  _buildPieChart(resultList),
+                  const SizedBox(height: 20),
+                  resultList.isNotEmpty &&
+                          resultList[0]['tevalSubmitted'] == 'SUBMITTED'
+                      ? Expanded(
+                          child: ListView.builder(
+                            itemCount: resultList.length,
+                            itemBuilder: (context, index) {
+                              final result = resultList[index];
+                              final color = Colors
+                                  .primaries[index % Colors.primaries.length];
+
+                              return _buildSubjectCard(
+                                context,
+                                subjectName: result['courseTitle'],
+                                grade: result['gradeLetter'],
+                                credit: result['totalCredit'].toDouble(),
+                                gpa: result['pointEquivalent'].toDouble(),
+                                color: color,
+                              );
+                            },
+                          ),
+                        )
+                      : Center(
+                          child: Text(
+                            'Complete Teaching Evaluation First',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyLarge!
+                                .copyWith(color: Colors.white),
+                          ),
                         ),
-                      )
-                    : Center(
-                        child: Text(
-                          'Complete Teaching Evaluation First',
-                          style:
-                              Theme.of(context).textTheme.bodyLarge!.copyWith(
-                                    color: Colors.white,
-                                  ),
-                        ),
-                      ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
 
-  Widget _buildPieChart() {
-    return GetBuilder<PersonalInfoController>(
-      builder: (controller) => Card(
-        elevation: 4,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              const Text(
-                'CGPA Distribution',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 20),
-              SizedBox(
-                height: 200,
-                child: PieChart(
-                  PieChartData(
-                    sectionsSpace: 2,
-                    centerSpaceRadius: 40,
-                    sections: List.generate(
-                        controller
-                            .studentAllSemesterResultList[cardIndex]['courses']
-                            .length, (index) {
-                      final color =
-                          Colors.primaries[index % Colors.primaries.length];
-                      return PieChartSectionData(
-                        color: color.shade300,
-                        value: controller
-                            .studentAllSemesterResultList[cardIndex]['courses']
-                                [index]
-                            .pointEquivalent,
-                        radius: 60,
-                        titleStyle: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      );
-                    }),
-                  ),
+  Widget _buildPieChart(List<dynamic> resultList) {
+    if (resultList.isEmpty) return const SizedBox();
+
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            const Text(
+              'GPA Distribution',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              height: 200,
+              child: PieChart(
+                PieChartData(
+                  sectionsSpace: 2,
+                  centerSpaceRadius: 40,
+                  sections: List.generate(resultList.length, (index) {
+                    final result = resultList[index];
+                    final color =
+                        Colors.primaries[index % Colors.primaries.length];
+                    final double value =
+                        (result['pointEquivalent'] as num?)?.toDouble() ?? 0.0;
+
+                    return PieChartSectionData(
+                      color: color.shade300,
+                      value: value,
+                      title: value.toStringAsFixed(2),
+                      radius: 60,
+                      titleStyle: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    );
+                  }),
                 ),
               ),
-              const SizedBox(height: 10),
-              Text(
-                  'Overall SGPA: ${controller.studentAllSemesterResultList[cardIndex]['courses'][0].cgpa}',
-                  style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w600)),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -197,16 +185,14 @@ class SemesterWiseResultScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(
-                height: 5,
-              ),
+              const SizedBox(height: 5),
               Text(
-                resultRemarks[grade],
+                resultRemarks[grade] ?? 'N/A',
                 style: Theme.of(context)
                     .textTheme
                     .bodyMedium!
                     .copyWith(color: Colors.white, fontWeight: FontWeight.bold),
-              )
+              ),
             ],
           )
         ],
@@ -215,7 +201,7 @@ class SemesterWiseResultScreen extends StatelessWidget {
   }
 }
 
-final Map<String, dynamic> resultRemarks = {
+final Map<String, String> resultRemarks = {
   'A+': 'Outstanding',
   'A': 'Excellent',
   'A-': 'Very Good',
@@ -223,7 +209,7 @@ final Map<String, dynamic> resultRemarks = {
   'B': 'Satisfactory',
   'B-': 'Above Average',
   'C+': 'Average',
-  'C': '	Bellow Average',
+  'C': 'Below Average',
   'D': 'Pass',
-  'F': 'Fail'
+  'F': 'Fail',
 };

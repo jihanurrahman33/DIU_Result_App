@@ -1,5 +1,5 @@
 class AppUrls {
-  static const String _baseUrl = 'https://diurecords.vercel.app/api';
+  static const String _baseUrl = 'http://software.diu.edu.bd:8006';
 
   static String personalInfoUrl(String studentId) =>
       '$_baseUrl/result/studentInfo?studentId=$studentId';
