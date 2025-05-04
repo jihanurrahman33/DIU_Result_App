@@ -53,6 +53,7 @@ class StudentResultController extends GetxController {
 
   List studentResults = [];
   List oneSemResult = [];
+  double overallCgpa = 0;
   getStudentResult(String studentId) async {
     searchingInProgress = true;
     update();
@@ -68,6 +69,8 @@ class StudentResultController extends GetxController {
         SemesterWiseResultListModel semesterWiseResultListModel =
             SemesterWiseResultListModel.fromJson(jsonData);
         oneSemResult = semesterWiseResultListModel.resultList;
+      } else {
+        Get.snackbar("Failed to load result", response.statusCode.toString());
       }
       if (oneSemResult.isNotEmpty) {
         studentResults.add({
@@ -76,7 +79,21 @@ class StudentResultController extends GetxController {
         update();
       }
     }
+    overallCgpa = calculateOverallCgpa();
     searchingInProgress = false;
     update();
+  }
+
+  double calculateOverallCgpa() {
+    overallCgpa = 0;
+    double sumOfPointAndCredit = 0;
+    double sumOfTotalCredit = 0;
+    for (var semester in studentResults) {
+      for (var course in semester['oneSemRes']) {
+        sumOfPointAndCredit += (course.pointEquivalent * course.totalCredit);
+        sumOfTotalCredit += course.totalCredit;
+      }
+    }
+    return sumOfPointAndCredit / sumOfTotalCredit;
   }
 }

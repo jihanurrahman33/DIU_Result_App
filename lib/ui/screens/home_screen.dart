@@ -28,6 +28,7 @@ class HomeScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(16.0),
                 child: TextFormField(
                   onFieldSubmitted: (value) async {
+                    studentResultController.studentResults.clear();
                     await Get.find<PersonalInfoController>()
                         .getPersonalInfo(value);
                     await Get.find<StudentResultController>()
@@ -85,6 +86,25 @@ class HomeScreen extends StatelessWidget {
                                 'Batch',
                                 controller.personalInfo?.batchNo.toString() ??
                                     ''),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            Card(
+                              color: Colors.blueGrey,
+                              child: Center(
+                                child: studentResultController.overallCgpa <= 0
+                                    ? const Text(
+                                        'Search for result',
+                                        style: TextStyle(
+                                            color: Colors.white, fontSize: 20),
+                                      )
+                                    : Text(
+                                        'Overall CGPA: ${studentResultController.overallCgpa.toStringAsFixed(2)}',
+                                        style: const TextStyle(
+                                            color: Colors.white, fontSize: 20),
+                                      ),
+                              ),
+                            ),
                           ],
                         ),
                       ),
