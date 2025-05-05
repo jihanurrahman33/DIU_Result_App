@@ -27,6 +27,7 @@ class HomeScreen extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: TextFormField(
+                  textInputAction: TextInputAction.search,
                   onFieldSubmitted: (value) async {
                     studentResultController.studentResults.clear();
                     await Get.find<PersonalInfoController>()

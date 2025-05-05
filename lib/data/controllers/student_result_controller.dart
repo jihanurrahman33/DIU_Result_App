@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:http/http.dart';
+import 'package:logger/logger.dart';
 import 'package:result/data/models/semester_model.dart';
 import 'package:result/data/models/semester_wise_result_list_model.dart';
 import 'package:result/data/utils/urls.dart';
 
 class StudentResultController extends GetxController {
+  final Logger _logger = Logger();
   List semesterList = [];
   bool searchingInProgress = false;
   @override
@@ -18,7 +20,11 @@ class StudentResultController extends GetxController {
     semesterList.clear();
     try {
       final response = await get(Uri.parse(AppUrls.allSemesterIdNameUrl));
+      _logger.i("Url=>${AppUrls.allSemesterIdNameUrl}");
+
       if (response.statusCode == 200) {
+        _logger
+            .i("Status Code:${response.statusCode}" "Body=>${response.body}");
         final List<dynamic> jsonData = jsonDecode(response.body);
 
         for (var semesterData in jsonData) {
